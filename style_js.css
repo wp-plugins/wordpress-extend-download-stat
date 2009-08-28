@@ -1,0 +1,24 @@
+.wpeds_css_oneblock {
+display:none
+}
+
+.wpeds_css_optionh1 a:hover {
+text-decoration:underline;
+}
+
+.wpeds_css_optionh1 a,.wpeds_css_optionh1 a:link,.wpeds_css_optionh1 a:visited{
+cursor:pointer;
+cursor:hand;
+}
+
+.wpeds_css_oneblock {
+margin-bottom:10px;
+}
+
+.wpeds_css_hiddentd {
+display:none
+}
+
+.wpeds_css_hiddenspan {
+display:none
+}
