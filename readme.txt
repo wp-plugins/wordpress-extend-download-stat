@@ -12,6 +12,8 @@ Wordpress Extend Download Stat can retrieve the download stats of plugin or them
 
 Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you and display it using your preferred format. The retrieved data will be stored in your local server and you decide when it should re-synchronize the data.
 
+Suitable for plugin or theme developer.
+
 **Features**
 
 *   Retrieve download statistics and download URL by one click
