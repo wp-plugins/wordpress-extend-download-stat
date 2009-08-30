@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.0
+ * Version: 1.1
 */
 
 /*
@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.0';
+$zv_wpeds_plugin_ver = '1.1';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}">{name}</a> has been downloaded {total} times in total.';
 $zv_wpeds_urltoautosync = null;
@@ -110,7 +110,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
   } else {
     $atts['url'] = wpeds_formaturl($atts['url']);
     
-      if (!wpeds_validstaturl($atts['url'])) { return ''; }
+      if (!wpeds_validstaturl($atts['url'])) { return '[invalid url to stats page]'; }
     
     if (!isset($wpeds_data[$atts['url']])) {//cant find in stored data
     $getallstat = wpeds_getstat($atts['url']);
@@ -132,7 +132,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
         }
       }
       
-      if ($wpeds_options['autosynctime'] == 0) { $needresync = false; }
+      if (!empty($wpeds_options) && $wpeds_options['autosynctime'] == 0) { $needresync = false; }
       
       if ($needresync) {
         $zv_wpeds_urltoautosync[] = $atts['url'];
@@ -164,7 +164,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
     $output = str_ireplace($tobereplaced_single,$replacement,$formatused);
     
     if ($output == $formatused) {//not replaced, not in allowed array
-      $output = '';
+      $output = '[invalid tag for attribute &quot;get&quot;]';
     }
     
   } else {
@@ -183,7 +183,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
     $output = str_ireplace($tobereplaced,$replacement,$formatused);
   }
  
-  if ($atts['autop'] != 'false') {
+  if ($atts['autop'] != 'false' && $atts['autop'] != '0') {
     $output = wpautop($output);
   }
  
@@ -238,10 +238,15 @@ $wpeds_options = get_option('wpeds_options');
 $autorefreshmsg = ' <a href="'.$zv_wpeds_siteurl.'/wp-admin/options-general.php?page=wordpress-extend-download-stat/wordpress-extend-download-stat.php" style="color:red" title="Click here if the auto refresh does not work">Auto Refreshing...</a><script type="text/javascript">
 setTimeout("location.href=\''.$zv_wpeds_siteurl.'/wp-admin/options-general.php?page=wordpress-extend-download-stat/wordpress-extend-download-stat.php\';",1500);
 </script>';
-//$autorefreshmsg = '';
-$autosync_db = array('0'=>'They never outdate. I will synchronize them manually.','3600'=>'1 Hour','43200'=>'12 Hours','86400'=>'1 Day','259200'=>'3 Days','604800'=>'1 Week','2678400'=>'1 Month','15768000'=>'6 Months','31536000'=>'1 Year');
+if (!empty($wpeds_options)) { 
+  if ($wpeds_options['optionsautorefresh'] == 'false') { $autorefreshmsg = ''; }
+}
+$autosync_db = array('0'=>'They never outdate. I will synchronize them manually.','1800'=>'30 Minutes','3600'=>'1 Hour','10800'=>'3 Hours','21600'=>'6 Hours','43200'=>'12 Hours','86400'=>'1 Day','259200'=>'3 Days','432000'=>'5 Days','604800'=>'1 Week','2678400'=>'1 Month','15768000'=>'6 Months','31536000'=>'1 Year');
 $zv_wpeds_autosync_situations_db = array (0=>'Never. Check only when that data is needed. (default, recommended)','blog'=>'Only when visitors are surfing the blog. (might increase server load)','admin'=>'Only when visitors are surfing the admin panel. (might increase server load)','plugin'=>'Only when visitors are surfing the plugin option page - this page.','all'=>'At all places. (might increase server load)',);
 
+
+
+/* start form response */
 
 if (isset($_POST['wpeds_delete'])) {
   if ($_POST['wpeds_url'] != '') {
@@ -396,6 +401,11 @@ if (isset($_POST['wpeds_saveoptions'])) {
   $wpeds_options['autosync_situation'] = $zv_wpeds_autosync_situations_db[0];
   }
   
+  if (isset($_POST['wpeds_optionsautorefresh'])) {
+  $wpeds_options['optionsautorefresh'] = 'false';
+  } else {
+  unset($wpeds_options['optionsautorefresh']);
+  }
   
   //update data
   update_option('wpeds_options',$wpeds_options);
@@ -462,7 +472,9 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
     <?php
       foreach ($zv_wpeds_autosync_situations_db as $id => $value) {
         echo '<option value="'.$id.'"';
-        if ($wpeds_options['autosync_situation'] == $id) { echo ' selected="selected"'; }
+        if (!empty($wpeds_options)) {
+          if ($wpeds_options['autosync_situation'] == $id) { echo ' selected="selected"'; }
+        }
         echo '>'.$value.'</option>';
       }
     ?>
@@ -482,13 +494,23 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
     <?php
       foreach ($zv_wpeds_dateformat_db as $id => $value) {
         echo '<option value="'.$value.'"';
-        if ($wpeds_options['dateformat'] == $value) { echo ' selected="selected"'; }
+        if (!empty($wpeds_options)) {
+          if ($wpeds_options['dateformat'] == $value) { echo ' selected="selected"'; }
+        }
         echo '>'.date($value).'</option>';
       }
     ?>
     </select>
     <br />
     <small>Format for all date-related output. For {dateadded}, {lastsync} and {lastupdate} tags. If you want to show freshness, use {freshness} tag instead.</small>
+    </div>
+    
+    
+    <div class="wpeds_css_optionblock">
+    <strong>Disable the auto refresh in this page?</strong> <input type="checkbox" name="wpeds_optionsautorefresh" value="false" <?php if (!empty($wpeds_options)) { if ($wpeds_options['optionsautorefresh'] == 'false') { echo ' checked="checked"'; } } ?>/>
+    <br />
+    <small>To clear the POST data, we auto refresh again after you submit form in this page. This is to prevent time-consuming action like synchronization from being run again (in case you refresh the page).
+    Tick the checkbox if you don't want the auto refresh.</small>
     </div>
   
 
@@ -799,4 +821,50 @@ add_action('media_buttons', 'wpeds_add_media_button', 20);
 function wpeds_add_media_button() {
 global $zv_wpeds_plugin_dir;
 	echo '<a href="'.$zv_wpeds_plugin_dir.'media.php?tab=add&TB_iframe=true&amp;height=500&amp;width=640" class="thickbox" title="Add Wordpress Extend Download Stat"><img src="'.$zv_wpeds_plugin_dir.'images/media.gif" alt="Add Wordpress Extend Download Stat"></a>';
+}
+
+############# TEMPLATE TAGS #############
+
+function wpeds_output($args) {
+/*
+******** EXAMPLE OF USAGE ********
+
+####### echo (use &echo=1) #######
+wpeds_output('url=http://wordpress.org/extend/plugins/wordpress-extend-download-stat/stats/&format=1&echo=1');
+
+####### store in variable #######
+$stored = wpeds_output('url=http://wordpress.org/extend/plugins/wordpress-extend-download-stat/stats/&format=1');
+echo $stored;
+
+---------------------
+more info at http://zenverse.net/wordpress-extend-download-stat-plugin/#templatetags
+---------------------
+*/
+
+if ($args == '' || !$args || $args==null) { return; }
+
+$allowedvariable = array('url','format','get','autop','echo');
+
+$temp_queryarray = explode('&',$args);
+
+foreach ($temp_queryarray as $single_query) {
+  $thepairs = explode('=',$single_query);
+    if (!empty($thepairs) && count($thepairs) == 2) {
+      if (in_array($thepairs[0],$allowedvariable)) {
+        $queryarray[$thepairs[0]] = $thepairs[1];
+      }
+    }
+}
+
+if (empty($queryarray)) { return; }
+
+//echo '<pre>';
+//var_dump($queryarray);
+
+if (isset($queryarray['echo']) && $queryarray['echo'] == '0') {
+return wpeds_shortcode($queryarray);
+} else {
+echo wpeds_shortcode($queryarray);
+}
+
 }

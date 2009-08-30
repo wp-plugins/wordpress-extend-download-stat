@@ -4,15 +4,13 @@ Donate link: http://zenverse.net/support/
 Tags: download, statistics, number, wordpress, extend, theme, plugin
 Requires at least: 2.0.2
 Tested up to: 2.8.3
-Stable tag: 1.0
+Stable tag: 1.1
 
 Wordpress Extend Download Stat can retrieve the download stats of plugin or theme hosted at wordpress and display it using your preferred format.
 
 == Description ==
 
 Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you and display it using your preferred format. The retrieved data will be stored in your local server and you decide when it should re-synchronize the data.
-
-Suitable for plugin or theme developer.
 
 **Features**
 
@@ -22,15 +20,17 @@ Suitable for plugin or theme developer.
 *   Manage the plugin's behaviour and saved data at Plugin Option page
 *   You can create custom format at plugin option page and use it for output
 *   To make it easier, you can use media button to add downlaod stat to post (see screenshot : Media Button)
+*   Template tag function is available if you want to display stats in your template
 
 
 **Usage**
 
 *   To output download stat in blog post, use shortcode `[downloadstat]` in your post content / excerpt.
 *   To make it easier, you can use the media button (see screenshot for more info) and follow the steps given.
-*   See the link below for more info
+*   See the link below for more info about using shortcode and template tag function
 
-[How to use the shortcode](http://zenverse.net/wordpress-extend-download-stat-plugin/#usage) | [Plugin Page](http://zenverse.net/wordpress-extend-download-stat-plugin/) | [Plugin Author](http://zenverse.net/)
+[How to use the shortcode](http://zenverse.net/wordpress-extend-download-stat-plugin/#usage) | [How to use the template tag](http://zenverse.net/wordpress-extend-download-stat-plugin/#templatetags) | 
+[Plugin Page](http://zenverse.net/wordpress-extend-download-stat-plugin/) | [Plugin Author](http://zenverse.net/)
 
 == Installation ==
 
@@ -53,5 +53,11 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 3. Plugin Option Page
 
 == Changelog ==
+= 1.1 =
+* Added template tags function `wpeds_output`
+* Added error message for invalid shortcode
+* Fixed a small mistake in auto resync-ing the data
+* Added more definitions for outdated data (for you to run auto sync more frequently)
+ 
 = 1.0 =
-First version of Wordpress Extend Download Stat
+* First version of Wordpress Extend Download Stat

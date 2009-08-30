@@ -97,6 +97,11 @@ margin-bottom:10px;
 margin-bottom:5px;
 }
 
+.wpeds_css_optionblock small {
+font-size:11px;
+color:#444444
+}
+
 .wpeds_css_notice {
 background:#FFFFDB;border:1px solid #C2C63F;padding:4px;
 }
