@@ -63,6 +63,14 @@ background-color:#fff;
 margin-bottom:40px;
 }
 
+.wpeds_css_oneblock hr {
+background-color:#cccccc;
+border:0px;
+height:1px;
+font-size:1px;
+color:#cccccc
+}
+
 .wpeds_css_saveddata_jscontrol {
 float:left;
 padding:5px;
@@ -103,5 +111,5 @@ color:#444444
 }
 
 .wpeds_css_notice {
-background:#FFFFDB;border:1px solid #C2C63F;padding:4px;
+background:#f1f1f1;border:1px solid #cccccc;padding:4px;
 }

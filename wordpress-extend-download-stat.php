@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.1
+ * Version: 1.2
 */
 
 /*
@@ -64,17 +64,18 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.1';
+$zv_wpeds_plugin_ver = '1.2';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}">{name}</a> has been downloaded {total} times in total.';
 $zv_wpeds_urltoautosync = null;
 $zv_wpeds_dateformat_db = array ("d F Y",'d M Y','d-m-Y','d/m/Y',"d F Y g.i A",'d M Y g.i A','d-m-Y g.i A','d/m/Y g.i A',);
+$zv_wpeds_numberformat_db = array (',','',' ');
 
 require_once('functions.php');
 
 
 function wpeds_shortcode($atts) {
-global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
+global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db;
 
 	extract(shortcode_atts(array(
 		'url' => '',
@@ -96,8 +97,14 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
     }
   }
   
-  //$usedateformat = 'd F Y';
+  $usenumberformat = ',';
+  if (!empty($wpeds_options) && isset($wpeds_options['numberformat']) && $wpeds_options['numberformat']!='') {
+    if (in_array($wpeds_options['numberformat'],$zv_wpeds_numberformat_db)) {
+    $usenumberformat = $wpeds_options['numberformat'];
+    }
+  }
   
+  //$usedateformat = 'd F Y';
   //echo '<pre>';
   //var_dump($wpeds_data);
   
@@ -153,7 +160,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db;
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   $tobereplaced = array('{name}','{type}','{today}','{yesterday}','{lastweek}','{total}','{lastsync}','{url}','{dateadded}','{freshness}','{version}','{lastupdate}');
   $tobereplaced_single = array('name','type','today','yesterday','lastweek','total','lastsync','url','dateadded','freshness','version','lastupdate');  
-  $replacement = array($getallstat['name'],$getallstat['type'],$getallstat['today'],$getallstat['yesterday'],$getallstat['lastweek'],$getallstat['total'],date("$usedateformat",$getallstat['lastsync']),$getallstat['url'],date("$usedateformat",$getallstat['dateadded']),wpeds_gettimediff(wpeds_return_curr_timestamp()-$getallstat['lastsync']),$getallstat['version'],date("$usedateformat",$getallstat['lastupdate']));
+  $replacement = array($getallstat['name'],$getallstat['type'],number_format($getallstat['today'],0,'.',$usenumberformat),number_format($getallstat['yesterday'],0,'.',$usenumberformat),number_format($getallstat['lastweek'],0,'.',$usenumberformat),number_format($getallstat['total'],0,'.',$usenumberformat),date("$usedateformat",$getallstat['lastsync']),$getallstat['url'],date("$usedateformat",$getallstat['dateadded']),wpeds_gettimediff(wpeds_return_curr_timestamp()-$getallstat['lastsync']),$getallstat['version'],date("$usedateformat",$getallstat['lastupdate']));
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   if (!$isformattedinfo) {// single info
@@ -230,7 +237,7 @@ if ($wpeds_plugin_adminhead) { add_action('admin_head-'.$plugin_page, 'wpeds_wph
 }
 
 function wpeds_options() {
-global $zv_wpeds_plugin_name,$zv_wpeds_plugin_ver,$zv_wpeds_plugin_url,$zv_wpeds_siteurl,$zv_wpeds_plugin_dir,$zv_wpeds_dateformat_db;
+global $zv_wpeds_plugin_name,$zv_wpeds_plugin_ver,$zv_wpeds_plugin_url,$zv_wpeds_siteurl,$zv_wpeds_plugin_dir,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db;
 
 $wpeds_data = get_option('wpeds_data');
 $wpeds_formats = get_option('wpeds_formats');
@@ -286,6 +293,60 @@ if (isset($_POST['wpeds_syncnew'])) {
 }
 
 
+if (isset($_POST['wpeds_addbyuser'])) {
+  if ($_POST['wpeds_wpex_username'] != '') {
+    $wpex_username_pattern = '/^[a-zA-Z0-9-_+%]{1,}$/';
+    preg_match($wpex_username_pattern,$_POST['wpeds_wpex_username'],$valid_wpex_username);
+    if (is_array($valid_wpex_username) && count($valid_wpex_username)>0) {
+
+      $returnstr = '';
+      $num_synced = 0; $num_skipped = 0; $num_invalid = 0;
+      
+      $items_by_username = wpeds_getuseritems($_POST['wpeds_wpex_username']);
+      
+      //var_dump($items_by_username);
+      
+      $returnstr .= $_POST['wpeds_wpex_username'].' has '.count($items_by_username['plugins']).' plugins and '.count($items_by_username['themes']).' themes.<br />';
+      
+      $allurlstobesync = array_merge($items_by_username['plugins'],$items_by_username['themes']);
+      
+      foreach ($allurlstobesync as $url) {
+        if (substr($url,-1,1) != '/') { $url .= '/'; }
+        $url = wpeds_formaturl($url.'stats/');
+        if (!isset($wpeds_data[$url])) {
+          if (wpeds_validstaturl($url)) {
+            $getallstat = wpeds_getstat($url);
+            $wpeds_data[$url] = $getallstat;
+              if ($getallstat) {
+              //update data
+              update_option('wpeds_data',$wpeds_data);
+              }
+            $num_synced++;
+          } else {
+            $num_invalid++;
+          }
+
+        } else {
+          $num_skipped++;
+        }
+      }
+      
+      $returnstr .= $num_synced.' new items has been added to database.<br />';
+      if ($num_skipped > 0) { $returnstr .= $num_skipped.' items skipped due to data already exist.<br />'; }
+      if ($num_invalid > 0) { $returnstr .= $num_invalid.' items skipped due to invalid URL.<br />'; }
+      
+      $returnstr .= '<a href="'.$zv_wpeds_siteurl.'/wp-admin/options-general.php?page=wordpress-extend-download-stat/wordpress-extend-download-stat.php">Click here to refresh the page</a>.';
+      
+      echo '<div class="updated" style="padding:5px;"><b>'.$returnstr.'</b></div>';
+    } else {
+      echo '<div class="updated" style="padding:5px;"><b>The username is invalid.</b></div>';
+    }
+  } else {
+    echo '<div class="updated" style="padding:5px;"><b>Wordpress Extend Username cannot be empty.</b></div>';
+  }
+}
+
+
 if (isset($_POST['wpeds_resync'])) {
 
   if ($_POST['wpeds_url'] != '') {
@@ -326,6 +387,41 @@ if (isset($_POST['wpeds_resync'])) {
 }
 
 
+if (isset($_POST['wpeds_resyncall'])) {
+  if (!empty($wpeds_data)) {
+  
+    $atleastonetrue = false;
+    foreach ($wpeds_data as $url => $data) {
+      if (wpeds_validstaturl($url)) {
+  
+      $olddata = null;
+      if (isset($wpeds_data[$url])) {
+        $olddata = $wpeds_data[$url];
+      }
+    
+      $getallstat = wpeds_getstat($url,$olddata);
+    
+      if ($getallstat) {
+        $wpeds_data[$url] = $getallstat;
+        $atleastonetrue = true;
+      }
+    }
+    }//end foreach
+  
+    if ($atleastonetrue) {
+      //update data
+      update_option('wpeds_data',$wpeds_data);
+      echo '<div class="updated" style="padding:5px;"><b>All data has been successfully resynchronized.</b></div>';
+    } else {
+      echo '<div class="updated" style="padding:5px;"><b>Error. Invalid data for the URL.</b></div>';
+    }
+  
+  } else {
+    echo '<div class="updated" style="padding:5px;"><b>Error. There is no saved data to resync.</b></div>';    
+  }
+}
+
+
 if (isset($_POST['wpeds_editformat'])) {
   if ($_POST['wpeds_formattags'] != '') {
     if ($_POST['wpeds_formatid'] != '' && is_numeric($_POST['wpeds_formatid'])) {
@@ -333,15 +429,15 @@ if (isset($_POST['wpeds_editformat'])) {
       $wpeds_formats[$_POST['wpeds_formatid']]= array('name'=>$_POST['wpeds_formatname'],'format'=>$_POST['wpeds_formattags']);
       //update data
       update_option('wpeds_formats',$wpeds_formats);      
-      echo '<div class="updated" style="padding:5px;"><b>The format of id '.$_POST['wpeds_formatid'].' has been updated.</small></b></div>';
+      echo '<div class="updated" style="padding:5px;"><b>The format of id '.$_POST['wpeds_formatid'].' has been updated.</b></div>';
       } else {//pass to addformat
       $_POST['wpeds_addformat'] = 1;
       }
     } else {
-      echo '<div class="updated" style="padding:5px;"><b>Format id was not specified. Please submit the form properly.</small></b></div>';
+      echo '<div class="updated" style="padding:5px;"><b>Format id was not specified. Please submit the form properly.</b></div>';
     }
   } else {
-    echo '<div class="updated" style="padding:5px;"><b>The format cannot be empty.</small></b></div>';
+    echo '<div class="updated" style="padding:5px;"><b>The format cannot be empty.</b></div>';
   }
 }
 
@@ -359,9 +455,9 @@ if (isset($_POST['wpeds_addformat'])) {
     }
       //update data
       update_option('wpeds_formats',$wpeds_formats);
-      echo '<div class="updated" style="padding:5px;"><b>The new format has been added.</small>'.$autorefreshmsg.'</b></div>';
+      echo '<div class="updated" style="padding:5px;"><b>The new format has been added.'.$autorefreshmsg.'</b></div>';
   } else {
-    echo '<div class="updated" style="padding:5px;"><b>Error. The format is empty.</small></b></div>';
+    echo '<div class="updated" style="padding:5px;"><b>Error. The format is empty.</b></div>';
   }
 }
 
@@ -372,12 +468,12 @@ if (isset($_POST['wpeds_deleteformat'])) {
     $wpeds_formats[$_POST['wpeds_formatid']] = array('name'=>'','format'=>'');
     //update data
     update_option('wpeds_formats',$wpeds_formats);
-    echo '<div class="updated" style="padding:5px;"><b>Format id '.$_POST['wpeds_formatid'].' has been deleted.</small></b></div>';
+    echo '<div class="updated" style="padding:5px;"><b>Format id '.$_POST['wpeds_formatid'].' has been deleted.</b></div>';
     } else {
-    echo '<div class="updated" style="padding:5px;"><b>Delete failed. The format does not exist.</small></b></div>';
+    echo '<div class="updated" style="padding:5px;"><b>Delete failed. The format does not exist.</b></div>';
     }
   } else {
-    echo '<div class="updated" style="padding:5px;"><b>Format id was not specified. Please submit the form properly.</small></b></div>';
+    echo '<div class="updated" style="padding:5px;"><b>Format id was not specified. Please submit the form properly.</b></div>';
   }
 }
 
@@ -407,9 +503,17 @@ if (isset($_POST['wpeds_saveoptions'])) {
   unset($wpeds_options['optionsautorefresh']);
   }
   
+  
+  if (in_array($_POST['wpeds_numberformat'],$zv_wpeds_numberformat_db)) {
+  $wpeds_options['numberformat'] = $_POST['wpeds_numberformat'];
+  } else {
+  $wpeds_options['numberformat'] = $zv_wpeds_numberformat_db[0];
+  }
+  
+  
   //update data
   update_option('wpeds_options',$wpeds_options);
-  echo '<div class="updated" style="padding:5px;"><b>Plugin Options has been updated.</small></b></div>';
+  echo '<div class="updated" style="padding:5px;"><b>Plugin Options has been updated.</b></div>';
 }
 
 
@@ -418,9 +522,8 @@ if (isset($_POST['wpeds_resetoptions'])) {
   delete_option('wpeds_options');
   unset($wpeds_options);
   }
-  echo '<div class="updated" style="padding:5px;"><b>Plugin Options has been resetted.</small></b></div>';
+  echo '<div class="updated" style="padding:5px;"><b>Plugin Options has been resetted.</b></div>';
 }
-
 
 //$wpeds_data['http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/stats/']['lastsync'] = wpeds_return_curr_timestamp();
 //update_option('wpeds_data',$wpeds_data);
@@ -503,6 +606,25 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
     </select>
     <br />
     <small>Format for all date-related output. For {dateadded}, {lastsync} and {lastupdate} tags. If you want to show freshness, use {freshness} tag instead.</small>
+    </div>
+    
+    
+    <div class="wpeds_css_optionblock">
+    <strong>Number Format</strong> <select name="wpeds_numberformat">
+    <?php
+      foreach ($zv_wpeds_numberformat_db as $id => $value) {
+        echo '<option value="'.$value.'"';
+        if (!empty($wpeds_options) && isset($wpeds_options['numberformat'])) {
+          if ( $wpeds_options['numberformat'] == $value) { echo ' selected="selected"'; }
+        } else {
+          if ( $value == ',') { echo ' selected="selected"'; }
+        }
+        echo '>'.number_format(1234567,0,'.',$value).'</option>';
+      }
+    ?>
+    </select>
+    <br />
+    <small>Format for all number-related output. For {total}, {lastweek},{yesterday} and {today} tags.</small>
     </div>
     
     
@@ -647,14 +769,31 @@ document.write('<div style="background-image:url(<?php echo $zv_wpeds_plugin_dir
 
 <!-- -->
 
+
 <h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_addnewdata')">Add New Data</a></h1>
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_addnewdata">
-<form style="margin:10px;" method="post" onsubmit="if (document.getElementById('wpeds_syncnew_url').value == '') { document.getElementById('wpeds_syncnew_url').focus(); return false; } else { return true; }">
-URL to stats page : <input type="text" name="wpeds_url" id="wpeds_syncnew_url" style="border:1px solid #dddddd;padding:2px" size="70" value="" />
-<input type="submit" name="wpeds_syncnew" value="Synchronize" class="button-primary">
+<b><u>Add Single Data by URL</u></b><br />
+<form style="margin-top:10px;margin-bottom:10px;" method="post" onsubmit="if (document.getElementById('wpeds_syncnew_url').value == '') { document.getElementById('wpeds_syncnew_url').focus(); return false; } else { return true; }">
+URL to stats page : <input type="text" name="wpeds_url" id="wpeds_syncnew_url" style="border:1px solid #cccccc;padding:2px" size="70" value="" />
+<input type="submit" name="wpeds_syncnew" value="Add" class="button-primary">
+</form>
+<div class="wpeds_css_notice"><small>Please enter the url to the statistic page. EG: http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/stats/</small></div>
+
+<br /><hr /><br />
+
+<b><u>Add All Plugin/Themes Created by *Username @ Wordpress Extend*</u></b><br />
+
+<form style="margin-top:10px;margin-bottom:10px;" method="post" onsubmit="if (document.getElementById('wpeds_wpex_username').value == '') { document.getElementById('wpeds_wpex_username').focus(); return false; } else { return true; }">
+Wordpress Extend Username : <input type="text" name="wpeds_wpex_username" id="wpeds_wpex_username" style="border:1px solid #cccccc;padding:2px" size="30" value="" />
+<input type="submit" name="wpeds_addbyuser" value="Add" class="button-primary">
 </form>
 
-<div class="wpeds_css_notice"><small>Please enter the url to the statistic page. EG: http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/stats/</small></div>
+<div class="wpeds_css_notice"><small>
+http://wordpress.org/extend/plugins/profile/<span style="color:blue">zenverse</span><br />
+http://wordpress.org/extend/themes/profile/<span style="color:blue">zenverse</span><br />
+My username is <span style="color:blue">zenverse</span>.</small></div>
+
+
 </div>
 
 <!-- -->
@@ -663,6 +802,7 @@ URL to stats page : <input type="text" name="wpeds_url" id="wpeds_syncnew_url" s
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_customformat">
 <strong><u>User-created Formats</u></strong><br />
 <?php
+$numofformats = 0;
 if (empty($wpeds_formats)) {
 echo 'None found.';
 } else {
@@ -670,6 +810,7 @@ echo 'None found.';
   echo '<table class="widefat"><thead><tr><th>Id</th><th>Name</th><th>Format</th><th>Action</th><th>Use this</th></tr></thead>';
   foreach ($wpeds_formats as $formatid => $format) {
   if ($format['format']!='') {
+  $numofformats++;
     echo '<tr><td>'.$formatid.'</td><td><form method="post" action="">
     <div id="wpeds_formatdiv_name_'.$formatid.'">'.$format['name'].'</div>
     <div style="display:none" id="wpeds_formatdiv_editname_'.$formatid.'"><input style="border:1px solid #cccccc;padding:2px" type="text" name="wpeds_formatname" value="'.$format['name'].'" /></div>
@@ -727,17 +868,15 @@ If invalid format id was found, default format (below) will be used:
 <!-- -->
 
 
-<!--h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_overview')">Overview</a></h1>
-<div class="wpeds_css_oneblock" id="wpeds_oneblock_overview">
-You have <strong><?php echo count($wpeds_data); ?></strong> download stats entries.
-<?php
-  //if (!empty($wpeds_data)) {
-  //  
-  //}
-?>
-<br />
-You have <strong><?php echo count($wpeds_formats); ?></strong> custom formats.<br />
-</div-->
+<h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_extra')">Extra</a></h1>
+<div class="wpeds_css_oneblock" id="wpeds_oneblock_extra">
+<strong><u>Overview</u></strong><br />
+You have <strong><?php echo count($wpeds_data); ?></strong> download stat entries, which consists of <strong><?php echo $numofthemes; ?></strong> themes and <strong><?php echo $numofplugins; ?></strong> plugins. 
+<form method="post" action="" style="display:inline"><input type="submit" class="button" name="wpeds_resyncall" value="Resync All Data" onclick="return confirm('Are you sure you want to resynchronize all the saved data?\n(this might take some time, depends on number of data you have)\n\nPress OK to continue.')" /></form><br />
+
+You have <strong><?php echo $numofformats; ?></strong> custom output formats.<br />
+</div>
+
 
 
 <br /><br />

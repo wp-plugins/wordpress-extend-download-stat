@@ -1,13 +1,17 @@
 <?php
 
 function wpeds_return_curr_timestamp() {
-$ts = strtotime(date_i18n(__('Y-m-d G:i:s')));
+$ts = strtotime(date_i18n('Y-m-d G:i:s'));
 
 if ($ts) { return $ts; } else { return time(); }
 }
 
 function wpeds_kill_unwanted_fats($str) {
 return strip_tags(trim($str));
+}
+
+function wpeds_removecomma($numm) {
+return str_replace(',','',$numm);
 }
 
 function wpeds_getstat($url,$olddata=null) {
@@ -31,7 +35,7 @@ $iteminfo[2] = str_ireplace('Free ','',$iteminfo[2]);
 //$iteminfo[1] = item title/name
 //$iteminfo[2] = type of item
 
-$pattern = '/\<p class="button"\>\<a href=\'(.*)\'\>Download\<\/a\>\<\/p\>/s';
+$pattern = '/\<p class="button"\>\<a href=[\'|"](.*)[\'|"]\>Download\<\/a\>\<\/p\>/s';
 preg_match($pattern,$text,$downloadlink);
 
 //$downloadlink[1] = download link
@@ -72,10 +76,10 @@ $buildarray = array(
 'url' => wpeds_kill_unwanted_fats($downloadlink[1]),
 'version' => wpeds_kill_unwanted_fats($version[1]),
 'lastupdate'=>strtotime(wpeds_kill_unwanted_fats($lastupdate[1])),
-'today' => wpeds_kill_unwanted_fats($stat[1][0]),
-'yesterday' => wpeds_kill_unwanted_fats($stat[1][1]),
-'lastweek' => wpeds_kill_unwanted_fats($stat[1][2]),
-'total' => wpeds_kill_unwanted_fats($stat[1][3]),
+'today' => wpeds_kill_unwanted_fats(wpeds_removecomma($stat[1][0])),
+'yesterday' => wpeds_kill_unwanted_fats(wpeds_removecomma($stat[1][1])),
+'lastweek' => wpeds_kill_unwanted_fats(wpeds_removecomma($stat[1][2])),
+'total' => wpeds_kill_unwanted_fats(wpeds_removecomma($stat[1][3])),
 'dateadded' => $dateadded,
 'lastsync' => wpeds_return_curr_timestamp(),
 'lastvalues' => $lastvalues,
@@ -84,6 +88,44 @@ $buildarray = array(
 
 return $buildarray;
 }
+
+
+function wpeds_getuseritems($username) {
+
+$username = strtolower($username);
+
+$buildurl = array(
+'http://wordpress.org/extend/plugins/profile/'.$username,
+'http://wordpress.org/extend/themes/profile/'.$username
+);
+
+$loopid = 1;
+
+foreach ($buildurl as $url) {
+if ($loopid == 1) { $itemtype = 'plugins'; } else { $itemtype = 'themes'; }
+
+  $text = file_get_contents($url);
+  $pattern = '/\<h3\>\<a href=[\'|"](.*)[\'|"]\>(.*)\<\/a\>\<\/h3\>/U';
+  preg_match_all($pattern,$text,$matched);
+  
+  //$matched[1] = url array
+  //$matched[2] = item name array
+  
+  if (is_array($matched[1]) && count($matched[1])>0) {
+    //got item
+    $returnarray[$itemtype] = $matched[1];
+  } else {
+    $returnarray[$itemtype] = array();
+  }
+  
+$loopid++;
+}
+
+
+return $returnarray;
+//var_dump($urls[1]);
+}
+
 
 function wpeds_gettimediff($secsdiff,$forceshowtime=null) {
 $futureorpast = '';
@@ -145,12 +187,6 @@ if (empty($thearray) || !$thearray) { return; }
   }
 }
 
-
-function wpeds_removecomma($numm) {
-return str_replace(',','',$numm);
-}
-
-
 function wpeds_formaturl($url) {
 if (substr($url,0,7) != 'http://') {
 $url = 'http://'.$url;
@@ -163,7 +199,8 @@ return $url;
 
 
 function wpeds_validstaturl($url) {
-$pattern = '/^http:\/\/wordpress.org\/extend\/(.*)\/stats\/$/s';
+$url = strtolower($url);                  
+$pattern = '/^http:\/\/(www.)?wordpress.org\/extend\/(plugins|themes)\/(.*)\/stats\/$/s';
 preg_match($pattern,$url,$match);
 if (!empty($match)) {
   return true;
