@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.1
+ * Version: 1.2.2
 */
 
 /*
@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2.1';
+$zv_wpeds_plugin_ver = '1.2.2';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}">{name}</a> has been downloaded {total} times in total.';
 $zv_wpeds_urltoautosync = null;
@@ -1046,23 +1046,51 @@ var_dump($stored);
 $stored = wpeds_return_data_as_array('url=http://wordpress.org/extend/plugins/wordpress-extend-download-stat/stats/');
 var_dump($stored);
 
+####### disable auto-formatting all date and number                  #######
+####### timestamp will be returned for time-related data             #######
+####### unformatted numbers will be returned for number-related data #######
+$stored = wpeds_return_data_as_array('gettype=theme&autoformat=0');
+var_dump($stored);
+
 ---------------------
 more info at http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/
 ---------------------
 */
 
-global $wpeds_options;
+global $wpeds_options,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db;
 $wpeds_data = get_option('wpeds_data');
 if (empty($wpeds_data) || !$wpeds_data || count($wpeds_data) == 0) { return array(); }
 
 if ($args == '' || !$args || $args==null) { return; }
 
-$allowedvariable = array('url','gettype');
+$allowedvariable = array('url','gettype','autoformat');
 
 $queryarray = wpeds_tt_parse_args($args,$allowedvariable);
 
 if (empty($queryarray)) { return array(); }
 
+$autoformat = true;
+if (isset($queryarray['autoformat'])) {
+  if ($queryarray['autoformat'] == 0 || $queryarray['autoformat'] == 'false') {
+    $autoformat = false;
+  }
+}
+
+if ($autoformat) {
+  $usedateformat = $zv_wpeds_dateformat_db[0];
+  if (!empty($wpeds_options) && isset($wpeds_options['dateformat']) && $wpeds_options['dateformat']!='') {
+    if (in_array($wpeds_options['dateformat'],$zv_wpeds_dateformat_db)) {
+    $usedateformat = $wpeds_options['dateformat'];
+    }
+  }
+  
+  $usenumberformat = ',';
+  if (!empty($wpeds_options) && isset($wpeds_options['numberformat']) && $wpeds_options['numberformat']!='') {
+    if (in_array($wpeds_options['numberformat'],$zv_wpeds_numberformat_db)) {
+    $usenumberformat = $wpeds_options['numberformat'];
+    }
+  }
+}
 //echo '<pre>';
 //var_dump($queryarray);
 
@@ -1072,6 +1100,7 @@ if (isset($queryarray['url'])) {//single data
     if (isset($wpeds_data[$queryarray['url']])) {
       unset($wpeds_data[$queryarray['url']]['lastjump']);
       unset($wpeds_data[$queryarray['url']]['lastvalues']);
+      if ($autoformat) { $wpeds_data[$queryarray['url']] = wpeds_apply_format_to_array($wpeds_data[$queryarray['url']],'single',$usenumberformat,$usedateformat); }
       return $wpeds_data[$queryarray['url']];
     }
   }
@@ -1101,6 +1130,7 @@ if (isset($queryarray['url'])) {//single data
       $thearray = array();
     break;
     }
+    if ($autoformat && count($thearray)>0) { $thearray = wpeds_apply_format_to_array($thearray,'multiple',$usenumberformat,$usedateformat); }
     return $thearray;
   }
 }

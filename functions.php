@@ -210,7 +210,6 @@ if (!empty($match)) {
 }
 
 function wpeds_tt_parse_args($args,$allowedvariable) {
-
 $temp_queryarray = explode('&',$args);
 
 foreach ($temp_queryarray as $single_query) {
@@ -223,6 +222,33 @@ foreach ($temp_queryarray as $single_query) {
 }
 
 return $queryarray;
+}
+
+function wpeds_apply_format_to_array($array,$type,$numberformat,$dateformat) {
+
+if ($type == 'single' || $type == 'multiple') {} else { return; }
+
+if ($type == 'single') {
+  $array['lastupdate'] = date("$dateformat",$array['lastupdate']);
+  $array['dateadded'] = date("$dateformat",$array['dateadded']);
+  $array['lastsync'] = date("$dateformat",$array['lastsync']);
+  $array['today'] = number_format($array['today'],0,'.',$numberformat);
+  $array['yesterday'] = number_format($array['yesterday'],0,'.',$numberformat);
+  $array['lastweek'] = number_format($array['lastweek'],0,'.',$numberformat);
+  $array['total'] = number_format($array['total'],0,'.',$numberformat);  
+} else {
+  foreach ($array as $url => $data) {
+    $array[$url]['lastupdate'] = date("$dateformat",$array[$url]['lastupdate']);
+    $array[$url]['dateadded'] = date("$dateformat",$array[$url]['dateadded']);
+    $array[$url]['lastsync'] = date("$dateformat",$array[$url]['lastsync']);
+    $array[$url]['today'] = number_format($array[$url]['today'],0,'.',$numberformat);
+    $array[$url]['yesterday'] = number_format($array[$url]['yesterday'],0,'.',$numberformat);
+    $array[$url]['lastweek'] = number_format($array[$url]['lastweek'],0,'.',$numberformat);
+    $array[$url]['total'] = number_format($array[$url]['total'],0,'.',$numberformat);  
+  }
+}
+
+return $array;
 }
 
 ?>

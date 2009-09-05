@@ -4,7 +4,7 @@ Donate link: http://zenverse.net/support/
 Tags: download, statistics, number, wordpress, extend, theme, plugin
 Requires at least: 2.0.2
 Tested up to: 2.8.3
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 Wordpress Extend Download Stat can retrieve the download stats of plugin or theme hosted at wordpress and display it using your preferred format.
 
@@ -20,8 +20,8 @@ Sometimes you need to display the number of downloads of your plugin or theme ho
 *   Manage the plugin's behaviour and saved data at Plugin Option page
 *   You can create custom format at plugin option page and use it for output
 *   To make it easier, you can use media button to add download stat to post (see screenshot : Media Button)
-*   Template tag function is available if you want to display stats in your template
-*   Template tag function is available if you want to make a "download" page
+*   Template tag function is available if you want to display stats in your template (see links below)
+*   Template tag function is available if you want to make a "download" page (see links below)
 *   Quickly load all stats of your plugins/themes using your wordpress extend username at plugin option page > Add New Data
 
 
@@ -58,6 +58,9 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 3. Plugin Option Page
 
 == Changelog ==
+= 1.2.2 =
+* Added `autoformat` to template tag function `wpeds_return_data_as_array`(my apologies if you just upgraded few hours ago)
+
 = 1.2.1 =
 * Formatted the numbers at the stats table (forgot to do that in version 1.2)
 * Added template tag function `wpeds_return_data_as_array` (you might need it to make a "download" page)
