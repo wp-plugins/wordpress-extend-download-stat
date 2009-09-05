@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2
+ * Version: 1.2.1
 */
 
 /*
@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2';
+$zv_wpeds_plugin_ver = '1.2.1';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}">{name}</a> has been downloaded {total} times in total.';
 $zv_wpeds_urltoautosync = null;
@@ -540,7 +540,7 @@ $h1style = 'style="background-image:url('.$zv_wpeds_plugin_dir.'images/titleimg.
 
 <div style="padding:10px;border:1px solid #dddddd;background-color:#fff;-moz-border-radius:10px;margin-top:20px;margin-bottom:20px;">
 <?php
-echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plugin How-to, FAQs, Change Log & Info</a> | <strong><a href="http://zenverse.net/support/">Donate</a></strong> | <a href="http://zenverse.net/">by ZENVERSE</a>';
+echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plugin How-to, FAQs, Change Log & Info</a> | <a href="http://zenverse.net/support/">Donate via PayPal</a> | <a href="http://zenverse.net/">by ZENVERSE</a>';
 ?>
 </div>
 
@@ -646,13 +646,6 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
 <h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_saveddata')">Saved Data</a></h1>
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_saveddata">
 
-<script type="text/javascript">
-<!--
-document.write('<div style="background-image:url(<?php echo $zv_wpeds_plugin_dir; ?>images/grad.gif);" class="wpeds_css_saveddata_jscontrol"><strong>Show</strong> : <a onclick="wpeds_limitresult(\'all\')" id="wpeds_saveddata_jscontrol_text_all" style="border-bottom:1px solid #888888">All (<span id="wpeds_numsaveddata_all"></span>)</a> <i>|</i> <a onclick="wpeds_limitresult(\'plugins\')" id="wpeds_saveddata_jscontrol_text_plugins">Plugins (<span id="wpeds_numsaveddata_plugins"></span>)</a> <i>|</i> <a onclick="wpeds_limitresult(\'themes\')" id="wpeds_saveddata_jscontrol_text_themes">Themes (<span id="wpeds_numsaveddata_themes"></span>)</a></div>');
-//-->
-</script>
-
-<div style="clear:both"></div>
 <?php
 
 //echo '<pre>';
@@ -661,9 +654,30 @@ document.write('<div style="background-image:url(<?php echo $zv_wpeds_plugin_dir
   if ($wpeds_data=='' || empty($wpeds_data)) {
     echo 'No saved data.';
   } else {
+  
+  ?>
+  
+  <script type="text/javascript">
+  <!--
+  document.write('<div style="background-image:url(<?php echo $zv_wpeds_plugin_dir; ?>images/grad.gif);" class="wpeds_css_saveddata_jscontrol"><strong>Show</strong> : <a onclick="wpeds_limitresult(\'all\')" id="wpeds_saveddata_jscontrol_text_all" style="border-bottom:1px solid #888888">All (<span id="wpeds_numsaveddata_all"></span>)</a> <i>|</i> <a onclick="wpeds_limitresult(\'plugins\')" id="wpeds_saveddata_jscontrol_text_plugins">Plugins (<span id="wpeds_numsaveddata_plugins"></span>)</a> <i>|</i> <a onclick="wpeds_limitresult(\'themes\')" id="wpeds_saveddata_jscontrol_text_themes">Themes (<span id="wpeds_numsaveddata_themes"></span>)</a></div>');
+  //-->
+  </script>
+  
+  <div style="clear:both"></div>
+  
+  
+  <?php
+
     $swapcolours = 'fff';
     $loopid = 1;
     $numofthemes = 0; $numofplugins = 0;
+    
+    $usenumberformat = ',';
+    if (!empty($wpeds_options) && isset($wpeds_options['numberformat']) && $wpeds_options['numberformat']!='') {
+      if (in_array($wpeds_options['numberformat'],$zv_wpeds_numberformat_db)) {
+      $usenumberformat = $wpeds_options['numberformat'];
+      }
+    }    
     
     foreach ($wpeds_data as $url => $data) {
 
@@ -691,10 +705,10 @@ document.write('<div style="background-image:url(<?php echo $zv_wpeds_plugin_dir
       echo '     
       <table class="widefat" style="float:right;width:35%;">
         <thead><tr><th colspan="3">Download Stats'.$lastvalues_js_add.'</th></tr></thead>
-        <tr><td width="70" style="border-right:1px solid #dddddd;">Total</td><td>'.$data['total'].'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv1_'.$loopid.'">'.$data2[3].wpeds_showincrease($increase_array,'3').'</td></tr>
-        <tr><td style="border-right:1px solid #dddddd;">Today</td><td>'.$data['today'].'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv2_'.$loopid.'">'.$data2[0].wpeds_showincrease($increase_array,'0').'</td></tr>
-        <tr><td style="border-right:1px solid #dddddd;">Yesterday</td><td>'.$data['yesterday'].'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv3_'.$loopid.'">'.$data2[1].wpeds_showincrease($increase_array,'1').'</td></tr>
-        <tr><td style="border-right:1px solid #dddddd;">Last Week</td><td>'.$data['lastweek'].'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv4_'.$loopid.'">'.$data2[2].wpeds_showincrease($increase_array,'2').'</td></tr>';
+        <tr><td width="70" style="border-right:1px solid #dddddd;">Total</td><td>'.number_format($data['total'],0,'.',$usenumberformat).'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv1_'.$loopid.'">'.number_format($data2[3],0,'.',$usenumberformat).wpeds_showincrease($increase_array,'3').'</td></tr>
+        <tr><td style="border-right:1px solid #dddddd;">Today</td><td>'.number_format($data['today'],0,'.',$usenumberformat).'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv2_'.$loopid.'">'.number_format($data2[0],0,'.',$usenumberformat).wpeds_showincrease($increase_array,'0').'</td></tr>
+        <tr><td style="border-right:1px solid #dddddd;">Yesterday</td><td>'.number_format($data['yesterday'],0,'.',$usenumberformat).'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv3_'.$loopid.'">'.number_format($data2[1],0,'.',$usenumberformat).wpeds_showincrease($increase_array,'1').'</td></tr>
+        <tr><td style="border-right:1px solid #dddddd;">Last Week</td><td>'.number_format($data['lastweek'],0,'.',$usenumberformat).'</td><td class="wpeds_css_hiddentd" id="wpeds_lastdatadiv4_'.$loopid.'">'.number_format($data2[2],0,'.',$usenumberformat).wpeds_showincrease($increase_array,'2').'</td></tr>';
         
       echo '<tr><td colspan="3"><small id="wpeds_lastdatadiv5_'.$loopid.'" class="wpeds_css_hiddenspan">Time difference between datas : '.wpeds_gettimediff($data['lastjump'],true).'</small></td></tr></table>
         
@@ -878,6 +892,18 @@ You have <strong><?php echo $numofformats; ?></strong> custom output formats.<br
 </div>
 
 
+<!-- -->
+
+
+<h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_support')">Plugin Support</a></h1>
+<div class="wpeds_css_oneblock" id="wpeds_oneblock_support">
+If you have any problem with this plugin or feature request, feel free to leave comment at <a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#respond" target="_blank">here</a>.
+<br /><br />
+
+<strong><u>Documentations you might need</u></strong><br />
+<a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#usage" target="_blank">Understanding shortcode [downloadstat]</a> | <a target="_blank" href="http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/">Using Template Tag Functions</a>
+</div>
+
 
 <br /><br />
 <hr style="border:0px;height:1px;font-size:1px;margin-bottom:5px;background:#dddddd;color:#dddddd" />
@@ -962,11 +988,15 @@ global $zv_wpeds_plugin_dir;
 	echo '<a href="'.$zv_wpeds_plugin_dir.'media.php?tab=add&TB_iframe=true&amp;height=500&amp;width=640" class="thickbox" title="Add Wordpress Extend Download Stat"><img src="'.$zv_wpeds_plugin_dir.'images/media.gif" alt="Add Wordpress Extend Download Stat"></a>';
 }
 
+
+
 ############# TEMPLATE TAGS #############
 
 function wpeds_output($args) {
 /*
 ******** EXAMPLE OF USAGE ********
+
+similar to shortcode [downloadstat]
 
 ####### echo (use &echo=1) #######
 wpeds_output('url=http://wordpress.org/extend/plugins/wordpress-extend-download-stat/stats/&format=1&echo=1');
@@ -976,7 +1006,7 @@ $stored = wpeds_output('url=http://wordpress.org/extend/plugins/wordpress-extend
 echo $stored;
 
 ---------------------
-more info at http://zenverse.net/wordpress-extend-download-stat-plugin/#templatetags
+more info at http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/
 ---------------------
 */
 
@@ -984,16 +1014,7 @@ if ($args == '' || !$args || $args==null) { return; }
 
 $allowedvariable = array('url','format','get','autop','echo');
 
-$temp_queryarray = explode('&',$args);
-
-foreach ($temp_queryarray as $single_query) {
-  $thepairs = explode('=',$single_query);
-    if (!empty($thepairs) && count($thepairs) == 2) {
-      if (in_array($thepairs[0],$allowedvariable)) {
-        $queryarray[$thepairs[0]] = $thepairs[1];
-      }
-    }
-}
+$queryarray = wpeds_tt_parse_args($args,$allowedvariable);
 
 if (empty($queryarray)) { return; }
 
@@ -1004,6 +1025,84 @@ if (isset($queryarray['echo']) && $queryarray['echo'] == '0') {
 return wpeds_shortcode($queryarray);
 } else {
 echo wpeds_shortcode($queryarray);
+}
+
+}
+
+
+function wpeds_return_data_as_array($args) {
+/*
+******** EXAMPLE OF USAGE ********
+
+####### assign all plugins data (array) into a variable #######
+$stored = wpeds_return_data_as_array('gettype=plugin');
+var_dump($stored);
+
+####### assign all themes data (array) into a variable #######
+$stored = wpeds_return_data_as_array('gettype=theme');
+var_dump($stored);
+
+####### assign a single plugin's data (array) into a variable #######
+$stored = wpeds_return_data_as_array('url=http://wordpress.org/extend/plugins/wordpress-extend-download-stat/stats/');
+var_dump($stored);
+
+---------------------
+more info at http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/
+---------------------
+*/
+
+global $wpeds_options;
+$wpeds_data = get_option('wpeds_data');
+if (empty($wpeds_data) || !$wpeds_data || count($wpeds_data) == 0) { return array(); }
+
+if ($args == '' || !$args || $args==null) { return; }
+
+$allowedvariable = array('url','gettype');
+
+$queryarray = wpeds_tt_parse_args($args,$allowedvariable);
+
+if (empty($queryarray)) { return array(); }
+
+//echo '<pre>';
+//var_dump($queryarray);
+
+if (isset($queryarray['url'])) {//single data
+  $queryarray['url'] = wpeds_formaturl($queryarray['url']);
+  if (wpeds_validstaturl($queryarray['url'])) {
+    if (isset($wpeds_data[$queryarray['url']])) {
+      unset($wpeds_data[$queryarray['url']]['lastjump']);
+      unset($wpeds_data[$queryarray['url']]['lastvalues']);
+      return $wpeds_data[$queryarray['url']];
+    }
+  }
+} else {
+
+  if (isset($queryarray['gettype'])) {//get all data of 1 type
+    switch ($queryarray['gettype']) {
+    case 'theme':
+      foreach ($wpeds_data as $url => $data) {
+        if (strtolower($data['type']) == 'wordpress theme') {
+          unset($wpeds_data[$url]['lastjump']);
+          unset($wpeds_data[$url]['lastvalues']);
+          $thearray[] = $wpeds_data[$url];
+        }
+      }
+    break;
+    case 'plugin':
+      foreach ($wpeds_data as $url => $data) {
+        if (strtolower($data['type']) == 'wordpress plugin') {
+          $thearray[] = $wpeds_data[$url];
+          unset($thearray['lastjump']);
+          unset($thearray['lastvalues']);
+        }
+      }
+    break;
+    default:
+      $thearray = array();
+    break;
+    }
+    return $thearray;
+  }
 }
 
 }

@@ -4,7 +4,7 @@ Donate link: http://zenverse.net/support/
 Tags: download, statistics, number, wordpress, extend, theme, plugin
 Requires at least: 2.0.2
 Tested up to: 2.8.3
-Stable tag: 1.2
+Stable tag: 1.2.1
 
 Wordpress Extend Download Stat can retrieve the download stats of plugin or theme hosted at wordpress and display it using your preferred format.
 
@@ -21,6 +21,7 @@ Sometimes you need to display the number of downloads of your plugin or theme ho
 *   You can create custom format at plugin option page and use it for output
 *   To make it easier, you can use media button to add download stat to post (see screenshot : Media Button)
 *   Template tag function is available if you want to display stats in your template
+*   Template tag function is available if you want to make a "download" page
 *   Quickly load all stats of your plugins/themes using your wordpress extend username at plugin option page > Add New Data
 
 
@@ -30,7 +31,7 @@ Sometimes you need to display the number of downloads of your plugin or theme ho
 *   To make it easier, you can use the media button (see screenshot for more info) and follow the steps given.
 *   See the link below for more info about using shortcode and template tag function
 
-[How to use the shortcode](http://zenverse.net/wordpress-extend-download-stat-plugin/#usage) | [How to use the template tag](http://zenverse.net/wordpress-extend-download-stat-plugin/#templatetags) | 
+[How to use shortcode](http://zenverse.net/wordpress-extend-download-stat-plugin/#usage) | [How to use template tag functions](http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/) | 
 [Plugin Page](http://zenverse.net/wordpress-extend-download-stat-plugin/) | [Plugin Author](http://zenverse.net/)
 
 == Installation ==
@@ -43,7 +44,10 @@ Sometimes you need to display the number of downloads of your plugin or theme ho
 == Frequently Asked Questions ==
 
 = I can't add new data =
-You need to use the URL to the statistics page, not to the main page. First of all, check whether the URL you type is the URL to the statistics page (it ends with /stats/). For example, URL to my wordpress theme demo bar plugin is `http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/` and URL to its statistics page is `http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/stats/`. 
+You need to use the URL to the statistics page, not to the main page. First of all, check whether the URL you type is the URL to the statistics page (it ends with /stats/). For example, URL to my wordpress theme demo bar plugin is `http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/` and I should use `http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/stats/`. 
+
+= How to add download stat to post easily? =
+Easiest method is to use the media button when you create or edit post (see screenshot : media button)
 
 = How to display content inline =
 Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="" autop="false" get="total] times`
@@ -54,6 +58,10 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 3. Plugin Option Page
 
 == Changelog ==
+= 1.2.1 =
+* Formatted the numbers at the stats table (forgot to do that in version 1.2)
+* Added template tag function `wpeds_return_data_as_array` (you might need it to make a "download" page)
+
 = 1.2 =
 * Added number format option
 * Added resync all data feature
@@ -63,7 +71,7 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 * Added feature : Add All Plugins/Themes created by (Wordpress Extend) Username
 
 = 1.1 =
-* Added template tags function `wpeds_output`
+* Added template tag function `wpeds_output`
 * Added error message for invalid shortcode
 * Fixed a small mistake in auto resync-ing the data
 * Added more definitions for outdated data (for you to run auto sync more frequently)

@@ -209,4 +209,20 @@ if (!empty($match)) {
 }
 }
 
+function wpeds_tt_parse_args($args,$allowedvariable) {
+
+$temp_queryarray = explode('&',$args);
+
+foreach ($temp_queryarray as $single_query) {
+  $thepairs = explode('=',$single_query);
+    if (!empty($thepairs) && count($thepairs) == 2) {
+      if (in_array($thepairs[0],$allowedvariable)) {
+        $queryarray[$thepairs[0]] = $thepairs[1];
+      }
+    }
+}
+
+return $queryarray;
+}
+
 ?>
