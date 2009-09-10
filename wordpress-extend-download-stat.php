@@ -1017,11 +1017,13 @@ more info at http://zenverse.net/using-template-tag-function-in-wordpress-extend
 
 if ($args == '' || !$args || $args==null) { return; }
 
-$allowedvariable = array('url','format','get','autop','echo');
+$allowedvariable = array('url','format','get','echo');
 
 $queryarray = wpeds_tt_parse_args($args,$allowedvariable);
 
 if (empty($queryarray)) { return; }
+
+$queryarray['autop'] = 'false';
 
 //echo '<pre>';
 //var_dump($queryarray);

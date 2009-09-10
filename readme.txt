@@ -60,6 +60,7 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 == Changelog ==
 = 1.2.3 =
 * Changed the default format to a more "normal" and "suitable" format
+* Removed autop in template tag `wptdb_output()` (it should not have that option)
 
 = 1.2.2 =
 * Added `autoformat` to template tag function `wpeds_return_data_as_array`
