@@ -70,9 +70,8 @@ $format_select_string .= '</optgroup>
 </optgroup>';
 ?>
 
-<!-- start output -->
-<body style="padding:10px">
 
+<body style="padding:10px">
 
 
 <?php
@@ -101,7 +100,7 @@ $wpeds_addhtml = '';
             $wpeds_addhtml .= '[downloadstat url="'.$_POST['wpeds_url'].'"';
           } else {
             $wpeds_error = true;
-            echo 'Error. Invalid data retrieved from the URL.</b></div>';
+            echo 'Error. Invalid data retrieved from the URL.';
           }
           
           // manage format
@@ -156,7 +155,7 @@ $wpeds_addhtml = '';
       }
     } else {
       $wpeds_error = true;
-      echo 'Error. The URL cannot be empty.</b></div>';
+      $wpeds_errormsg = 'Error. The URL cannot be empty.';
     }
   break;
   case 'existing':

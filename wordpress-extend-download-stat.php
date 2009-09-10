@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.2
+ * Version: 1.2.3
 */
 
 /*
@@ -64,9 +64,9 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2.2';
+$zv_wpeds_plugin_ver = '1.2.3';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
-$zv_wpeds_default_format = '<a href="{url}">{name}</a> has been downloaded {total} times in total.';
+$zv_wpeds_default_format = '<a href="{url}" title="{name} has been downloaded {total} times in total">Download {name} ({total})</a>';
 $zv_wpeds_urltoautosync = null;
 $zv_wpeds_dateformat_db = array ("d F Y",'d M Y','d-m-Y','d/m/Y',"d F Y g.i A",'d M Y g.i A','d-m-Y g.i A','d/m/Y g.i A',);
 $zv_wpeds_numberformat_db = array (',','',' ');
@@ -786,7 +786,7 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
 
 <h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_addnewdata')">Add New Data</a></h1>
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_addnewdata">
-<b><u>Add Single Data by URL</u></b><br />
+<h4>Add Single Data by URL</h4>
 <form style="margin-top:10px;margin-bottom:10px;" method="post" onsubmit="if (document.getElementById('wpeds_syncnew_url').value == '') { document.getElementById('wpeds_syncnew_url').focus(); return false; } else { return true; }">
 URL to stats page : <input type="text" name="wpeds_url" id="wpeds_syncnew_url" style="border:1px solid #cccccc;padding:2px" size="70" value="" />
 <input type="submit" name="wpeds_syncnew" value="Add" class="button-primary">
@@ -795,7 +795,7 @@ URL to stats page : <input type="text" name="wpeds_url" id="wpeds_syncnew_url" s
 
 <br /><hr /><br />
 
-<b><u>Add All Plugin/Themes Created by *Username @ Wordpress Extend*</u></b><br />
+<h4>Add All Plugin/Themes Created by *Username @ Wordpress Extend*</h4>
 
 <form style="margin-top:10px;margin-bottom:10px;" method="post" onsubmit="if (document.getElementById('wpeds_wpex_username').value == '') { document.getElementById('wpeds_wpex_username').focus(); return false; } else { return true; }">
 Wordpress Extend Username : <input type="text" name="wpeds_wpex_username" id="wpeds_wpex_username" style="border:1px solid #cccccc;padding:2px" size="30" value="" />
@@ -814,7 +814,7 @@ My username is <span style="color:blue">zenverse</span>.</small></div>
 
 <h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_customformat')">Custom Output Formats</a></h1>
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_customformat">
-<strong><u>User-created Formats</u></strong><br />
+<h4>User-created Formats</h4>
 <?php
 $numofformats = 0;
 if (empty($wpeds_formats)) {
@@ -837,7 +837,7 @@ echo 'None found.';
     <input type="submit" onclick="return confirm(\'Are you sure you want to delete this format of id '.$formatid.' ?\')" name="wpeds_deleteformat" class="button" value="Delete" />
     <input type="hidden" name="wpeds_formatid" value="'.$formatid.'" />
     </form>
-    </td><td width="140"><textarea rows="2" cols="20">[downloadstat url="" format="'.$formatid.'"]</textarea></td></tr>';
+    </td><td width="140"><textarea onclick="this.select()" rows="2" cols="20">[downloadstat url="" format="'.$formatid.'"]</textarea></td></tr>';
   } else {//deleted format
     $deletedformats .= '<tr><td>'.$formatid.'</td><td><form method="post" action="">
     <div id="wpeds_formatdiv_name_'.$formatid.'">Deleted</div>
@@ -859,7 +859,7 @@ echo 'None found.';
 ?>
 
 <br /><br />
-<strong><u>Add New Format</u></strong><br />
+<h4>Add New Format</h4>
 <?php include( ABSPATH . 'wp-content/plugins/wordpress-extend-download-stat/listoftags.html'); ?>
 
 <form method="post" action="" onsubmit="if (document.getElementById('wpeds_formattags').value == '') { document.getElementById('wpeds_formattags').focus(); return false; } else { return true; }">
@@ -872,7 +872,7 @@ echo 'None found.';
 
 
 <br /><br />
-<strong><u>Default format</u></strong><br />
+<h4>Default format</h4>
 If invalid format id was found, default format (below) will be used:
 <p><code>&lt;a href="{url}">{name}&lt;/a> has been downloaded {total} times in total.</code></p>
 
@@ -884,7 +884,7 @@ If invalid format id was found, default format (below) will be used:
 
 <h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_extra')">Extra</a></h1>
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_extra">
-<strong><u>Overview</u></strong><br />
+<h4>Overview</h4>
 You have <strong><?php echo count($wpeds_data); ?></strong> download stat entries, which consists of <strong><?php echo $numofthemes; ?></strong> themes and <strong><?php echo $numofplugins; ?></strong> plugins. 
 <form method="post" action="" style="display:inline"><input type="submit" class="button" name="wpeds_resyncall" value="Resync All Data" onclick="return confirm('Are you sure you want to resynchronize all the saved data?\n(this might take some time, depends on number of data you have)\n\nPress OK to continue.')" /></form><br />
 
@@ -900,8 +900,13 @@ You have <strong><?php echo $numofformats; ?></strong> custom output formats.<br
 If you have any problem with this plugin or feature request, feel free to leave comment at <a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#respond" target="_blank">here</a>.
 <br /><br />
 
-<strong><u>Documentations you might need</u></strong><br />
+<h4>Documentations you might need</h4>
 <a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#usage" target="_blank">Understanding shortcode [downloadstat]</a> | <a target="_blank" href="http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/">Using Template Tag Functions</a>
+
+<br /><br />
+
+<h4>Author's Message</u></h4>
+The development of this plugin took a lot of time and effort, so please don't forget to <a href="http://zenverse.net/support/">donate via PayPal</a> if you found this plugin useful to ensure continued development.
 </div>
 
 

@@ -63,6 +63,15 @@ background-color:#fff;
 margin-bottom:40px;
 }
 
+.wpeds_css_oneblock h4 {
+margin:0px;padding:3px;
+margin-bottom:6px;
+border-top:1px solid #fff;
+border-bottom:1px solid #bbbbbb;
+background:#f4f4f4;
+color:#333333
+}
+
 .wpeds_css_oneblock hr {
 background-color:#cccccc;
 border:0px;
@@ -111,5 +120,7 @@ color:#444444
 }
 
 .wpeds_css_notice {
-background:#f1f1f1;border:1px solid #cccccc;padding:4px;
+background-color:#f1f1f1;
+border:1px solid #cccccc;
+padding:4px;
 }
