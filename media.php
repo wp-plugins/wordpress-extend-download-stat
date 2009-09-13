@@ -60,6 +60,7 @@ if (!empty($wpeds_formats) && $wpeds_formats) {
   foreach ($wpeds_formats as $formatid => $format) {
     if ($format['format'] != '') {
     $format_select_string .= '<option value="'.$formatid.'">'.$format['name'].'</option>';
+    $formatsdb[$formatid] = $format['format'];
     }
   }
 }
@@ -273,7 +274,7 @@ if ($wpeds_errormsg != '') {
 <div class="wpeds_css_optionblock">
 <table><tr><td width="100" style="font-weight:bold">Output Format</td><td>
 <select name="wpeds_format" onchange="formatonchange(this.options[selectedIndex].value,'2')">
-<?php echo $format_select_string; ?></select>
+<?php echo $format_select_string; ?></select><div class="wpeds_format_tags_div" id="format_tags_div2"></div>
 </td></tr></table>
 </div>
 
@@ -300,7 +301,7 @@ if ($wpeds_errormsg != '') {
 <option value="dateadded">Date when the data was first loaded</option>
 </optgroup>
 </select><br />
-<small>Please note that only numbers will be displayed.</small>
+<small>Please note that only the info you choose will be displayed.</small>
 </td></tr></table>
 </div>
 
@@ -329,6 +330,12 @@ if ($wpeds_errormsg != '') {
 </form>
 
 </div>
+
+
+
+
+
+
 
 
 
@@ -381,7 +388,7 @@ $nosaveddata = true;
 <table><tr><td width="100" style="font-weight:bold">Output Format</td><td>
 <select name="wpeds_format" onchange="formatonchange(this.options[selectedIndex].value)">
 <?php echo $format_select_string; ?>
-</select>
+</select><div class="wpeds_format_tags_div" id="format_tags_div"></div>
 
 <script type="text/javascript">
   function formatonchange(value,extradivid) {
@@ -399,8 +406,12 @@ $nosaveddata = true;
       } else if (value == '[single]') {
         hideunuseddivs(extradivid);
         document.getElementById("singlecountdiv"+extradivid).style.display = 'block'
+      } else if (value == '') {
+        hideunuseddivs(extradivid);
+        return;
       } else {
         hideunuseddivs(extradivid);
+        showformattags(value,extradivid);
         return;
       }
     }
@@ -412,6 +423,24 @@ function hideunuseddivs(extradivid) {
   }
 document.getElementById("singlecountdiv"+extradivid).style.display = 'none'
 document.getElementById("addnewformatdiv"+extradivid).style.display = 'none'
+document.getElementById('format_tags_div'+extradivid).innerHTML = '';
+document.getElementById('format_tags_div'+extradivid).style.display = 'none'
+}
+
+function showformattags(fid,extradivid) {
+var formats_array = new Array();
+<?php
+  if (is_array($formatsdb) && count($formatsdb)>0) {
+    foreach ($formatsdb as $formatid => $formattags) {
+      echo 'formats_array['.$formatid.'] = \''.htmlspecialchars(wpeds_adaptjs($formattags)).'\';'."\n";
+    }
+  }
+?>
+//if (typeof(formats_array[fid])!='undefined') {
+  document.getElementById('format_tags_div'+extradivid).style.display = 'block'
+  document.getElementById('format_tags_div'+extradivid).innerHTML = formats_array[fid];
+//}
+
 }
 
 </script>
@@ -441,7 +470,7 @@ document.getElementById("addnewformatdiv"+extradivid).style.display = 'none'
 <option value="dateadded">Date when the data was first loaded</option>
 </optgroup>
 </select><br />
-<small>Please note that only numbers will be displayed.</small>
+<small>Please note that only the info you choose will be displayed.</small>
 </td></tr></table>
 </div>
 

@@ -58,8 +58,12 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 3. Plugin Option Page
 
 == Changelog ==
+= 1.2.4 =
+* Template Tag functions now accept arguments in array form
+* Added 3 buttons under  "Plugin Support & Extra" menu for you to resync all data or delete all options
+
 = 1.2.3 =
-* Changed the default format to a more "normal" and "suitable" format
+* Changed the default format to a more normal and suitable format
 * Removed autop in template tag `wptdb_output()` (it should not have that option)
 
 = 1.2.2 =

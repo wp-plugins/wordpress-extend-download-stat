@@ -124,3 +124,11 @@ background-color:#f1f1f1;
 border:1px solid #cccccc;
 padding:4px;
 }
+
+.wpeds_format_tags_div {
+font-size:11px;
+padding:5px;
+background:#f1f1f1;
+border:1px solid #cccccc;
+display:none;
+}

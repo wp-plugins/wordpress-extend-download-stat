@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.3
+ * Version: 1.2.4
 */
 
 /*
@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2.3';
+$zv_wpeds_plugin_ver = '1.2.4';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}" title="{name} has been downloaded {total} times in total">Download {name} ({total})</a>';
 $zv_wpeds_urltoautosync = null;
@@ -262,6 +262,7 @@ if (isset($_POST['wpeds_delete'])) {
       //save data
       update_option('wpeds_data',$wpeds_data);
       echo '<div class="updated" style="padding:5px;"><b>The data of <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small> has been deleted.'.$autorefreshmsg.'</b></div>';
+      if ($autorefreshmsg != '') { die(); }
     } else {
       echo '<div class="updated" style="padding:5px;"><b>No data found for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small></b></div>';
     }
@@ -284,6 +285,7 @@ if (isset($_POST['wpeds_syncnew'])) {
         //update data
         update_option('wpeds_data',$wpeds_data);
         echo '<div class="updated" style="padding:5px;"><b>Data has been successfully loaded for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small>'.$autorefreshmsg.'</b></div>';
+        if ($autorefreshmsg != '') { die(); }
         } else {
         echo '<div class="updated" style="padding:5px;"><b>Error. Invalid data for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small></b></div>';
         }      
@@ -372,11 +374,13 @@ if (isset($_POST['wpeds_resync'])) {
 
     if ($nochange) { //no changes
       echo '<div class="updated" style="padding:5px;"><b>No changes detected for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small>'.$autorefreshmsg.'</b></div>';
+      if ($autorefreshmsg != '') { die(); }
     } else {
       if ($getallstat) {
       //update data
       update_option('wpeds_data',$wpeds_data);
       echo '<div class="updated" style="padding:5px;"><b>Data has been successfully updated for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small>'.$autorefreshmsg.'</b></div>';
+      if ($autorefreshmsg != '') { die(); }
       } else {
       echo '<div class="updated" style="padding:5px;"><b>Error. Invalid data for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small></b></div>';
       }
@@ -455,7 +459,8 @@ if (isset($_POST['wpeds_addformat'])) {
     }
       //update data
       update_option('wpeds_formats',$wpeds_formats);
-      echo '<div class="updated" style="padding:5px;"><b>The new format has been added.'.$autorefreshmsg.'</b></div>';
+      echo '<div class="updated" style="padding:5px;"><b>A new format has been added.'.$autorefreshmsg.'</b></div>';
+      if ($autorefreshmsg != '') { die(); }
   } else {
     echo '<div class="updated" style="padding:5px;"><b>Error. The format is empty.</b></div>';
   }
@@ -523,6 +528,22 @@ if (isset($_POST['wpeds_resetoptions'])) {
   unset($wpeds_options);
   }
   echo '<div class="updated" style="padding:5px;"><b>Plugin Options has been resetted.</b></div>';
+}
+
+if (isset($_POST['wpeds_delete_allformat'])) {
+  if (!empty($wpeds_formats)) {
+  delete_option('wpeds_formats');
+  unset($wpeds_formats);
+  }
+  echo '<div class="updated" style="padding:5px;"><b>All custom output formats have been deleted.</b></div>';
+}
+
+if (isset($_POST['wpeds_delete_alldata'])) {
+  if (!empty($wpeds_data)) {
+  delete_option('wpeds_data');
+  unset($wpeds_data);
+  }
+  echo '<div class="updated" style="padding:5px;"><b>All saved data have been deleted.</b></div>';
 }
 
 //$wpeds_data['http://wordpress.org/extend/plugins/wordpress-theme-demo-bar/stats/']['lastsync'] = wpeds_return_curr_timestamp();
@@ -652,7 +673,7 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
 //var_dump($wpeds_data);
 
   if ($wpeds_data=='' || empty($wpeds_data)) {
-    echo 'No saved data.';
+    echo 'No saved data. You can add new data below.';
   } else {
   
   ?>
@@ -882,28 +903,30 @@ If invalid format id was found, default format (below) will be used:
 <!-- -->
 
 
-<h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_extra')">Extra</a></h1>
-<div class="wpeds_css_oneblock" id="wpeds_oneblock_extra">
-<h4>Overview</h4>
-You have <strong><?php echo count($wpeds_data); ?></strong> download stat entries, which consists of <strong><?php echo $numofthemes; ?></strong> themes and <strong><?php echo $numofplugins; ?></strong> plugins. 
-<form method="post" action="" style="display:inline"><input type="submit" class="button" name="wpeds_resyncall" value="Resync All Data" onclick="return confirm('Are you sure you want to resynchronize all the saved data?\n(this might take some time, depends on number of data you have)\n\nPress OK to continue.')" /></form><br />
-
-You have <strong><?php echo $numofformats; ?></strong> custom output formats.<br />
-</div>
-
-
-<!-- -->
-
-
-<h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_support')">Plugin Support</a></h1>
+<h1 <?php echo $h1style; ?>><a onclick="wpeds_toggle('wpeds_oneblock_support')">Plugin Support & Extra</a></h1>
 <div class="wpeds_css_oneblock" id="wpeds_oneblock_support">
-If you have any problem with this plugin or feature request, feel free to leave comment at <a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#respond" target="_blank">here</a>.
-<br /><br />
+If you have any problem with this plugin or you want to suggest a feature, feel free to leave comment at <a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#respond" target="_blank">here</a>.
+<br /><br /><br />
+
+<h4>Overview</h4>
+You have <strong><?php echo count($wpeds_data); ?></strong> download stat entries, which consists of <strong><?php echo $numofthemes; ?></strong> themes and <strong><?php echo $numofplugins; ?></strong> plugins.<br />
+You have <strong><?php echo $numofformats; ?></strong> custom output formats.
+
+<br /><br /><br />
 
 <h4>Documentations you might need</h4>
 <a href="http://zenverse.net/wordpress-extend-download-stat-plugin/#usage" target="_blank">Understanding shortcode [downloadstat]</a> | <a target="_blank" href="http://zenverse.net/using-template-tag-function-in-wordpress-extend-download-stat-plugin/">Using Template Tag Functions</a>
 
-<br /><br />
+<br /><br /><br />
+
+<h4>Actions</h4>
+<form action="" method="post" style="display:inline"><p class="submit" style="display:inline">
+<input type="submit" class="button" name="wpeds_resyncall" value="Resync All Data" onclick="return confirm('Are you sure you want to resynchronize all the saved data?\n(this might take some time, depends on number of data you have)\n\nPress OK to continue.')" />
+<input type="submit" name="wpeds_delete_alldata" class="button" onclick="return confirm('Do you really want to delete all your saved data?\nWARNING : This action cannot be undo.');" value="Delete All Saved Data" />
+<input type="submit" name="wpeds_delete_allformat" class="button" onclick="return confirm('Do you really want to delete all your custom output formats?\nWARNING : This action cannot be undo.');" value="Delete All Custom Output Formats" />
+</form>
+
+<br /><br /><br />
 
 <h4>Author's Message</u></h4>
 The development of this plugin took a lot of time and effort, so please don't forget to <a href="http://zenverse.net/support/">donate via PayPal</a> if you found this plugin useful to ensure continued development.
@@ -1015,13 +1038,16 @@ more info at http://zenverse.net/using-template-tag-function-in-wordpress-extend
 ---------------------
 */
 
-if ($args == '' || !$args || $args==null) { return; }
-
 $allowedvariable = array('url','format','get','echo');
 
-$queryarray = wpeds_tt_parse_args($args,$allowedvariable);
+if (!is_array($args)) { // the argument is string
+  if ($args == '' || !$args || $args==null) { return; }
+  $queryarray = wpeds_tt_parse_args($args,$allowedvariable);
+} else {
+  $queryarray = wpeds_tt_remove_invalid_args($args,$allowedvariable);
+}
 
-if (empty($queryarray)) { return; }
+if (empty($queryarray)) { echo '[invalid arguments]'; return; }
 
 $queryarray['autop'] = 'false';
 
@@ -1065,16 +1091,21 @@ more info at http://zenverse.net/using-template-tag-function-in-wordpress-extend
 */
 
 global $wpeds_options,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db;
+
 $wpeds_data = get_option('wpeds_data');
 if (empty($wpeds_data) || !$wpeds_data || count($wpeds_data) == 0) { return array(); }
 
-if ($args == '' || !$args || $args==null) { return; }
-
 $allowedvariable = array('url','gettype','autoformat');
 
-$queryarray = wpeds_tt_parse_args($args,$allowedvariable);
+if (!is_array($args)) { // the argument is string
+  if ($args == '' || !$args || $args==null) { return; }
+  $queryarray = wpeds_tt_parse_args($args,$allowedvariable);
+} else {
+  $queryarray = wpeds_tt_remove_invalid_args($args,$allowedvariable);
+}
 
 if (empty($queryarray)) { return array(); }
+
 
 $autoformat = true;
 if (isset($queryarray['autoformat'])) {

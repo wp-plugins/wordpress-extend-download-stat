@@ -224,6 +224,15 @@ foreach ($temp_queryarray as $single_query) {
 return $queryarray;
 }
 
+function wpeds_tt_remove_invalid_args($args,$allowedvariable) {
+  foreach ($args as $name => $value) {
+    if (!in_array($name,$allowedvariable)) {
+      unset($args[$name]);
+    }
+  }
+return $args;
+}
+
 function wpeds_apply_format_to_array($array,$type,$numberformat,$dateformat) {
 
 if ($type == 'single' || $type == 'multiple') {} else { return; }
@@ -249,6 +258,11 @@ if ($type == 'single') {
 }
 
 return $array;
+}
+
+function wpeds_adaptjs($str) {
+$str = str_replace('\'','\\\'',$str);
+return $str;
 }
 
 ?>
