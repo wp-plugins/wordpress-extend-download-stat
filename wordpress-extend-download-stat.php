@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.4
+ * Version: 1.2.5
 */
 
 /*
@@ -237,7 +237,7 @@ if ($wpeds_plugin_adminhead) { add_action('admin_head-'.$plugin_page, 'wpeds_wph
 }
 
 function wpeds_options() {
-global $zv_wpeds_plugin_name,$zv_wpeds_plugin_ver,$zv_wpeds_plugin_url,$zv_wpeds_siteurl,$zv_wpeds_plugin_dir,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db;
+global $zv_wpeds_plugin_name,$zv_wpeds_plugin_ver,$zv_wpeds_plugin_url,$zv_wpeds_siteurl,$zv_wpeds_plugin_dir,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db,$zv_wpeds_default_format;
 
 $wpeds_data = get_option('wpeds_data');
 $wpeds_formats = get_option('wpeds_formats');
@@ -847,11 +847,11 @@ echo 'None found.';
   if ($format['format']!='') {
   $numofformats++;
     echo '<tr><td>'.$formatid.'</td><td><form method="post" action="">
-    <div id="wpeds_formatdiv_name_'.$formatid.'">'.$format['name'].'</div>
-    <div style="display:none" id="wpeds_formatdiv_editname_'.$formatid.'"><input style="border:1px solid #cccccc;padding:2px" type="text" name="wpeds_formatname" value="'.$format['name'].'" /></div>
+    <div id="wpeds_formatdiv_name_'.$formatid.'">'.htmlspecialchars(stripslashes($format['name'])).'</div>
+    <div style="display:none" id="wpeds_formatdiv_editname_'.$formatid.'"><input style="border:1px solid #cccccc;padding:2px" type="text" name="wpeds_formatname" value="'.htmlspecialchars(stripslashes($format['name'])).'" /></div>
     </td><td>
     <div id="wpeds_formatdiv_format_'.$formatid.'">'.htmlspecialchars(stripslashes($format['format'])).'</div>
-    <div style="display:none" id="wpeds_formatdiv_editformat_'.$formatid.'"><input style="border:1px solid #cccccc;padding:2px" type="text" name="wpeds_formattags" value="'.$format['format'].'" size="40" /><br />
+    <div style="display:none" id="wpeds_formatdiv_editformat_'.$formatid.'"><input style="border:1px solid #cccccc;padding:2px" type="text" name="wpeds_formattags" value="'.htmlspecialchars(stripslashes($format['format'])).'" size="40" /><br />
     <input type="submit" name="wpeds_editformat" class="button-primary" value="Save Edit" /></div>
     </td><td width="90">
     <input type="button" name="wpeds_deleteformat" class="button" onclick="wpeds_jsfunc_toggleform(\''.$formatid.'\'); if (this.value == \'Edit\') { this.value = \'Cancel Edit\'; } else { this.value = \'Edit\'; }" value="Edit" /><br />
@@ -895,7 +895,7 @@ echo 'None found.';
 <br /><br />
 <h4>Default format</h4>
 If invalid format id was found, default format (below) will be used:
-<p><code>&lt;a href="{url}">{name}&lt;/a> has been downloaded {total} times in total.</code></p>
+<p><code><?php echo htmlspecialchars($zv_wpeds_default_format); ?></code></p>
 
 </div>
 

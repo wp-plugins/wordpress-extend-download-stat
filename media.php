@@ -59,8 +59,8 @@ $format_select_string = '
 if (!empty($wpeds_formats) && $wpeds_formats) {
   foreach ($wpeds_formats as $formatid => $format) {
     if ($format['format'] != '') {
-    $format_select_string .= '<option value="'.$formatid.'">'.$format['name'].'</option>';
-    $formatsdb[$formatid] = $format['format'];
+    $format_select_string .= '<option value="'.$formatid.'">'.htmlspecialchars(stripslashes($format['name'])).'</option>';
+    $formatsdb[$formatid] = stripslashes($format['format']);
     }
   }
 }
@@ -361,7 +361,7 @@ echo '<select name="wpeds_url" onchange="if (this.options[selectedIndex].value !
   if (is_array($wpeds_select_plugins) && count($wpeds_select_plugins) > 0) {
   echo '<optgroup label="Wordpress Plugins">';
   foreach ($wpeds_select_plugins as $url) {
-  echo '<option value="'.$url.'">'.$wpeds_data[$url]['name'].'</option>';
+  echo '<option value="'.$url.'">'.htmlspecialchars(stripslashes($wpeds_data[$url]['name'])).'</option>';
   }
   echo '</optgroup>';
   }
@@ -369,7 +369,7 @@ echo '<select name="wpeds_url" onchange="if (this.options[selectedIndex].value !
   if (is_array($wpeds_select_themes) && count($wpeds_select_themes) > 0) {
   echo '<optgroup label="Wordpress Themes">';
   foreach ($wpeds_select_themes as $url) {
-  echo '<option value="'.$url.'">'.$wpeds_data[$url]['name'].'</option>';
+  echo '<option value="'.$url.'">'.htmlspecialchars(stripslashes($wpeds_data[$url]['name'])).'</option>';
   }
   echo '</optgroup>';
   }
