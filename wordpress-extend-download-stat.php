@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.5
+ * Version: 1.2.6
 */
 
 /*
@@ -64,15 +64,14 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2.5';
+$zv_wpeds_plugin_ver = '1.2.6';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}" title="{name} has been downloaded {total} times in total">Download {name} ({total})</a>';
 $zv_wpeds_urltoautosync = null;
 $zv_wpeds_dateformat_db = array ("d F Y",'d M Y','d-m-Y','d/m/Y',"d F Y g.i A",'d M Y g.i A','d-m-Y g.i A','d/m/Y g.i A',);
 $zv_wpeds_numberformat_db = array (',','',' ');
 
-require_once('functions.php');
-
+require_once( ABSPATH . 'wp-content/plugins/wordpress-extend-download-stat/functions.php');
 
 function wpeds_shortcode($atts) {
 global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db,$zv_wpeds_numberformat_db;
@@ -168,7 +167,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db,
     //if (!in_array($atts['get'],$allowed_value)) { $atts['get'] = 'total'; }
     //$output = $getallstat[$atts['get']];
     $formatused = $atts['get'];
-    $output = str_ireplace($tobereplaced_single,$replacement,$formatused);
+    $output = str_replace($tobereplaced_single,$replacement,$formatused);
     
     if ($output == $formatused) {//not replaced, not in allowed array
       $output = '[invalid tag for attribute &quot;get&quot;]';
@@ -187,7 +186,7 @@ global $zv_wpeds_default_format,$zv_wpeds_urltoautosync,$zv_wpeds_dateformat_db,
       $formatused = $wpeds_formats[$atts['format']]['format'];
       }
     }
-    $output = str_ireplace($tobereplaced,$replacement,$formatused);
+    $output = str_replace($tobereplaced,$replacement,$formatused);
   }
  
   if ($atts['autop'] != 'false' && $atts['autop'] != '0') {
