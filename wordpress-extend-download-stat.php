@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.6
+ * Version: 1.2.7
 */
 
 /*
@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2.6';
+$zv_wpeds_plugin_ver = '1.2.7';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}" title="{name} has been downloaded {total} times in total">Download {name} ({total})</a>';
 $zv_wpeds_urltoautosync = null;

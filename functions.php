@@ -30,7 +30,7 @@ $pattern = '/\<title\>WordPress \&\#8250; (.*) \&laquo; (Free WordPress Themes|W
 preg_match($pattern,$text,$iteminfo);
 
 if (substr($iteminfo[2],-1,1) == 's') { $iteminfo[2] = substr($iteminfo[2],0,(strlen($iteminfo[2])-1)); }
-$iteminfo[2] = str_ireplace('Free ','',$iteminfo[2]);
+$iteminfo[2] = str_replace('Free ','',$iteminfo[2]);
 
 //$iteminfo[1] = item title/name
 //$iteminfo[2] = type of item
