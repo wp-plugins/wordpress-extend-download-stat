@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.3';
+$zv_wpeds_plugin_ver = '1.3.1';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}" title="{name} has been downloaded {total} times in total">Download {name} ({total})</a>';
 $zv_wpeds_urltoautosync = null;
@@ -365,7 +365,7 @@ if (isset($_POST['wpeds_resync'])) {
     
     $nochange = false;
     if ($olddata) {
-    if ($olddata['today'].'/'.$olddata['yesterday'].'/'.$olddata['lastweek'].'/'.$olddata['total'] == $getallstat['today'].'/'.$getallstat['yesterday'].'/'.$getallstat['lastweek'].'/'.$getallstat['total']) {
+    if ($olddata['version'].'/'.$olddata['today'].'/'.$olddata['yesterday'].'/'.$olddata['lastweek'].'/'.$olddata['total'] == $getallstat['version'].'/'.$getallstat['today'].'/'.$getallstat['yesterday'].'/'.$getallstat['lastweek'].'/'.$getallstat['total']) {
       $nochange = true;
     }
     }
