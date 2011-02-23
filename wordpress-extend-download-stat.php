@@ -560,7 +560,7 @@ $h1style = 'style="background-image:url('.$zv_wpeds_plugin_dir.'images/titleimg.
 
 <div style="padding:10px;border:1px solid #dddddd;background-color:#fff;-moz-border-radius:10px;margin-top:20px;margin-bottom:20px;">
 <?php
-echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plugin How-to, FAQs, Change Log & Info</a> | <a href="http://zenverse.net/support/">Donate via PayPal</a> | <a href="http://zenverse.net/">by ZENVERSE</a>';
+echo 'Version '.$zv_wpeds_plugin_ver.' | <a target="_blank" href="'.$zv_wpeds_plugin_url.'">Plugin How-to, FAQs, Change Log & Info</a> | <a target="_blank" href="http://zenverse.net/support/">Support or Donate via Paypal</a> | <a target="_blank" href="http://zenverse.net/">by ZENVERSE</a>';
 ?>
 </div>
 
