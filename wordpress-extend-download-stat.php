@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.3
+ * Version: 1.3.1
 */
 
 /*
