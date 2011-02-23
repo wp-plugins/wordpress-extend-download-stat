@@ -5,7 +5,7 @@
  * Description: Sometimes you need to display the number of downloads of your plugin or theme hosted by wordpress, Wordpress Extend Download Stat can retrieve it for you. The retrieved data will be stored on your local server and you decide when it should re-synchronize the data.
  * Author: Zen
  * Author URI: http://zenverse.net/
- * Version: 1.2.7
+ * Version: 1.3
 */
 
 /*
@@ -64,7 +64,7 @@ if ( ! defined( 'WP_CONTENT_URL' ) ) {
 $zv_wpeds_plugin_name = 'Wordpress Extend Download Stat';
 $zv_wpeds_plugin_dir = WP_CONTENT_URL.'/plugins/wordpress-extend-download-stat/';
 $zv_wpeds_siteurl = get_option('siteurl');
-$zv_wpeds_plugin_ver = '1.2.7';
+$zv_wpeds_plugin_ver = '1.3';
 $zv_wpeds_plugin_url = 'http://zenverse.net/wordpress-extend-download-stat-plugin/';
 $zv_wpeds_default_format = '<a href="{url}" title="{name} has been downloaded {total} times in total">Download {name} ({total})</a>';
 $zv_wpeds_urltoautosync = null;
@@ -279,8 +279,8 @@ if (isset($_POST['wpeds_syncnew'])) {
     echo '<div class="updated" style="padding:5px;"><b>Invalid URL to statistics page. <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small></b></div>';
     } else {
       $getallstat = wpeds_getstat($_POST['wpeds_url']);
-      $wpeds_data[$_POST['wpeds_url']] = $getallstat;
         if ($getallstat) {
+        $wpeds_data[$_POST['wpeds_url']] = $getallstat;
         //update data
         update_option('wpeds_data',$wpeds_data);
         echo '<div class="updated" style="padding:5px;"><b>Data has been successfully loaded for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small>'.$autorefreshmsg.'</b></div>';
@@ -358,13 +358,12 @@ if (isset($_POST['wpeds_resync'])) {
     }
     
     $getallstat = wpeds_getstat($_POST['wpeds_url'],$olddata);
-    $wpeds_data[$_POST['wpeds_url']] = $getallstat;
 
     //if (isset($wpeds_data[$_POST['wpeds_url']])) {
     //  unset($wpeds_data[$_POST['wpeds_url']]);    
     //}
     
-    $nochange = false;    
+    $nochange = false;
     if ($olddata) {
     if ($olddata['today'].'/'.$olddata['yesterday'].'/'.$olddata['lastweek'].'/'.$olddata['total'] == $getallstat['today'].'/'.$getallstat['yesterday'].'/'.$getallstat['lastweek'].'/'.$getallstat['total']) {
       $nochange = true;
@@ -376,6 +375,7 @@ if (isset($_POST['wpeds_resync'])) {
       if ($autorefreshmsg != '') { die(); }
     } else {
       if ($getallstat) {
+      $wpeds_data[$_POST['wpeds_url']] = $getallstat;
       //update data
       update_option('wpeds_data',$wpeds_data);
       echo '<div class="updated" style="padding:5px;"><b>Data has been successfully updated for <small style="color:#3A81AD">&lt; '.$_POST['wpeds_url'].' ></small>'.$autorefreshmsg.'</b></div>';
@@ -935,7 +935,7 @@ The development of this plugin took a lot of time and effort, so please don't fo
 <br /><br />
 <hr style="border:0px;height:1px;font-size:1px;margin-bottom:5px;background:#dddddd;color:#dddddd" />
 <small style="color:#999999">
-<a target="_blank" href="http://zenverse.net/category/wordpress-plugins/">More plugins by me</a> &nbsp; | &nbsp; <a target="_blank" href="http://zenverse.net/category/wpthemes/">Free Wordpress Themes</a> &nbsp; | &nbsp; Thank you for using my plugin.
+<a target="_blank" href="http://zenverse.net/category/wordpress-plugins/">More plugins by me</a> &nbsp; | &nbsp; <a target="_blank" href="http://zenverse.net/category/wpthemes/">Free Wordpress Themes</a> &nbsp; | &nbsp; <a target="_blank" href="http://themes.zenverse.net/">Premium Wordpress Themes</a> &nbsp; | &nbsp; Thank you for using my plugin.
 </small>
 
 

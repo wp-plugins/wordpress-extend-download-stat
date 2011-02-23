@@ -3,8 +3,8 @@ Contributors: Zen
 Donate link: http://zenverse.net/support/
 Tags: download, statistics, number, wordpress, extend, theme, plugin
 Requires at least: 2.0.2
-Tested up to: 2.8.4
-Stable tag: 1.2.7
+Tested up to: 3.0.5
+Stable tag: 1.3
 
 Wordpress Extend Download Stat can retrieve the download stats of plugin or theme hosted at wordpress and display it using your preferred format.
 
@@ -58,6 +58,9 @@ Add autop="false" to the shortcode. For example, `Downloaded [downloadstat url="
 3. Plugin Option Page
 
 == Changelog ==
+= 1.3 =
+* Fixed the unable to retrieve data problem, due to wordpress changed their website html codes & structure.
+
 = 1.2.7 =
 * Replaces one more `str_ireplace` function with `str_replace` in functions.php (I missed that in previous update)
  

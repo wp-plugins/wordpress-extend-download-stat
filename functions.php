@@ -15,39 +15,49 @@ return str_replace(',','',$numm);
 }
 
 function wpeds_getstat($url,$olddata=null) {
+
+if (strpos($url,'/themes/')) {
+  $type = 'Wordpress Theme';
+} else if (strpos($url,'/plugins/')) {
+  $type = 'Wordpress Plugin';
+} else {
+  return false;
+}
+
 $text = file_get_contents($url);
 
 $pattern = '/\<td\>([0-9,]*)\<\/td\>/s';
-
 preg_match_all($pattern,$text,$stat);
-
 //$stat[1][0] = today
 //$stat[1][1] = yesterday
 //$stat[1][2] = last week
 //$stat[1][3] = total
 
 $pattern = '/\<title\>WordPress \&\#8250; (.*) \&laquo; (Free WordPress Themes|WordPress Plugins)\<\/title\>/s';
-preg_match($pattern,$text,$iteminfo);
+preg_match($pattern,$text,$iteminfo);//$iteminfo[1] = item title/name
 
-if (substr($iteminfo[2],-1,1) == 's') { $iteminfo[2] = substr($iteminfo[2],0,(strlen($iteminfo[2])-1)); }
-$iteminfo[2] = str_replace('Free ','',$iteminfo[2]);
+if ($type == 'Wordpress Plugin') {
 
-//$iteminfo[1] = item title/name
-//$iteminfo[2] = type of item
+  $pattern = '/\<p class="button"\>\<a href=[\'|"](.*)[\'|"]\>Download(.*)\<\/a\>\<\/p\>/Us';
+  preg_match($pattern,$text,$downloadlink);//$downloadlink[1] = download link
+  
+  $version[1] = str_replace(' Version ','',$downloadlink[2]); 
+  
+  $pattern = '/\<strong\>Last Updated:\<\/strong\>(.*)\<\/p\>/U';
+  preg_match($pattern,$text,$lastupdate);//$lastupdate[1] = last update date
+  
+} else {
 
-$pattern = '/\<p class="button"\>\<a href=[\'|"](.*)[\'|"]\>Download\<\/a\>\<\/p\>/s';
-preg_match($pattern,$text,$downloadlink);
-
-//$downloadlink[1] = download link
-
-$pattern = '/\<li\>\<strong\>Version:\<\/strong\>(.*)\<\/li\>/U';
-preg_match($pattern,$text,$version);
-//$version[1] = latest version
-
-$pattern = '/\<li\>\<strong\>Last Updated:\<\/strong\>(.*)\<\/li\>/U';
-preg_match($pattern,$text,$lastupdate);
-//$lastupdate[1] = last update date
-
+  $pattern = '/\<p class="button"\>\<a href=[\'|"](.*)[\'|"]\>Download\<\/a\>\<\/p\>/Us';
+  preg_match($pattern,$text,$downloadlink);//$downloadlink[1] = download link
+  
+  $pattern = '/\<li\>\<strong\>Version:\<\/strong\>(.*)\<\/li\>/U';
+  preg_match($pattern,$text,$version);//$version[1] = latest version 
+  
+  $pattern = '/\<li\>\<strong\>Last Updated:\<\/strong\>(.*)\<\/li\>/U';
+  preg_match($pattern,$text,$lastupdate);//$lastupdate[1] = last update date
+  
+}
 
 if ($iteminfo[1] == NULL || $stat[1][0] == NULL || $downloadlink[1] == NULL) {
 return false;
@@ -72,7 +82,7 @@ $lastjump = wpeds_return_curr_timestamp()-$olddata['lastsync'];
 
 $buildarray = array(
 'name' => $iteminfo[1],
-'type' => $iteminfo[2],
+'type' => $type,
 'url' => wpeds_kill_unwanted_fats($downloadlink[1]),
 'version' => wpeds_kill_unwanted_fats($version[1]),
 'lastupdate'=>strtotime(wpeds_kill_unwanted_fats($lastupdate[1])),
@@ -86,6 +96,8 @@ $buildarray = array(
 'lastjump' => $lastjump,
 );
 
+//echo '<pre>';var_dump($buildarray);echo '</pre>';
+//die();
 return $buildarray;
 }
 
