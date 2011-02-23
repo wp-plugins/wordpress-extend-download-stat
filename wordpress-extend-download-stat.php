@@ -701,8 +701,8 @@ echo 'Version '.$zv_wpeds_plugin_ver.' | <a href="'.$zv_wpeds_plugin_url.'">Plug
     
     foreach ($wpeds_data as $url => $data) {
 
-      if ($data['type']=='WordPress Plugin') { $numofplugins++; $typestr = 'plugins'; }
-      if ($data['type']=='WordPress Theme') { $numofthemes++; $typestr = 'themes'; }
+      if (strtolower($data['type'])==strtolower('WordPress Plugin')) { $numofplugins++; $typestr = 'plugins'; }
+      if (strtolower($data['type'])==strtolower('WordPress Theme')) { $numofthemes++; $typestr = 'themes'; }
       
       if ($data['lastvalues'] != '') {
       $lastvalues_js_add = '<script type="text/javascript">

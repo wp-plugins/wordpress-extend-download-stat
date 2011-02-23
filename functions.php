@@ -17,9 +17,9 @@ return str_replace(',','',$numm);
 function wpeds_getstat($url,$olddata=null) {
 
 if (strpos($url,'/themes/')) {
-  $type = 'Wordpress Theme';
+  $type = 'WordPress Theme';
 } else if (strpos($url,'/plugins/')) {
-  $type = 'Wordpress Plugin';
+  $type = 'WordPress Plugin';
 } else {
   return false;
 }
@@ -36,7 +36,7 @@ preg_match_all($pattern,$text,$stat);
 $pattern = '/\<title\>WordPress \&\#8250; (.*) \&laquo; (Free WordPress Themes|WordPress Plugins)\<\/title\>/s';
 preg_match($pattern,$text,$iteminfo);//$iteminfo[1] = item title/name
 
-if ($type == 'Wordpress Plugin') {
+if ($type == 'WordPress Plugin') {
 
   $pattern = '/\<p class="button"\>\<a href=[\'|"](.*)[\'|"]\>Download(.*)\<\/a\>\<\/p\>/Us';
   preg_match($pattern,$text,$downloadlink);//$downloadlink[1] = download link
